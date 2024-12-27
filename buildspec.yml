@@ -8,9 +8,10 @@ phases:
       - pip install -r requirements.txt
   build:
     commands:
-      - zip function.zip src/products/*.py
+      - mkdir -p build  # Create a known folder for artifacts
+      - zip build/function.zip src/products/*.py
+      - cp infra/template.yaml build/
 artifacts:
   files:
-    - function.zip
-    - infra/template.yaml
-  base-directory: . # Places these files in the root of BuildArtifact
+    - build/*
+  base-directory: build  # Ensures all artifacts are placed under the 'build' directory
