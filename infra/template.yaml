@@ -1,23 +1,11 @@
 Resources:
-  ProductsTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: ProductsTableUnique123 # Add a unique suffix
-      AttributeDefinitions:
-        - AttributeName: productId
-          AttributeType: S
-      KeySchema:
-        - AttributeName: productId
-          KeyType: HASH
-      BillingMode: PAY_PER_REQUEST
-
   LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: LambdaFunctionUnique123 # Add a unique suffix
+      FunctionName: LambdaFunctionUnique123
       Handler: lambda_function.lambda_handler
       Role: arn:aws:iam::211125598740:role/LambdaExecutionRole
       Runtime: python3.9
       Code:
         S3Bucket: serverless-microservices-artifacts
-        S3Key: function.zip
+        S3Key: ServerlessMicroservi/BuildArtif/PyOydGW/function.zip
