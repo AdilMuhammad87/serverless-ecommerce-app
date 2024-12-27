@@ -78,8 +78,7 @@
                             "StackName": "ServerlessStack",
                             "TemplatePath": "BuildArtifact::infra/template.yaml",
                             "Capabilities": "CAPABILITY_NAMED_IAM",
-                            "RoleArn": "arn:aws:iam::211125598740:role/CloudFormationExecutionRole",
-                            "ParameterOverrides": "{ \"BucketName\": \"serverless-microservices-artifacts\", \"ObjectKey\": \"BuildArtifact/function.zip\" }"
+                            "RoleArn": "arn:aws:iam::211125598740:role/CloudFormationExecutionRole"
                         },
                         "inputArtifacts": [
                             {
