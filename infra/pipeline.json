@@ -60,6 +60,33 @@
                         ]
                     }
                 ]
+            },
+            {
+                "name": "Deploy",
+                "actions": [
+                    {
+                        "name": "DeployWithCloudFormation",
+                        "actionTypeId": {
+                            "category": "Deploy",
+                            "owner": "AWS",
+                            "provider": "CloudFormation",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "ActionMode": "CREATE_UPDATE",
+                            "StackName": "ServerlessStack",
+                            "TemplatePath": "BuildArtifact::infra/template.yaml",
+                            "Capabilities": "CAPABILITY_NAMED_IAM",
+                            "RoleArn": "arn:aws:iam::211125598740:role/CloudFormationExecutionRole"
+                        },
+                        "inputArtifacts": [
+                            {
+                                "name": "BuildArtifact"
+                            }
+                        ]
+                    }
+                ]
             }
         ]
     }
