@@ -13,3 +13,4 @@ artifacts:
   files:
     - function.zip
     - infra/template.yaml
+  discard-paths: yes

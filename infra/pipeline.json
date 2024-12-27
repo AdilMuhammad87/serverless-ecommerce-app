@@ -46,7 +46,9 @@
                         },
                         "runOrder": 1,
                         "configuration": {
-                            "ProjectName": "ServerlessMicroservicesBuildProject"
+                            "ProjectName": "ServerlessMicroservicesBuildProject",
+                            "OutputArtifactFormat": "CODE_ZIP",
+                            "OutputArtifactName": "BuildOutput" 
                         },
                         "inputArtifacts": [
                             {
@@ -55,7 +57,7 @@
                         ],
                         "outputArtifacts": [
                             {
-                                "name": "BuildArtifact"
+                                "name": "BuildOutput"
                             }
                         ]
                     }
