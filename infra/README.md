@@ -39,8 +39,8 @@ This directory contains the configuration for the AWS CodePipeline and related r
 
 ### To Delete the Pipeline
 Run:
-bash
-    aws codepipeline delete-pipeline --name ServerlessMicroservicesPipeline
+   ```bash
+   aws codepipeline delete-pipeline --name ServerlessMicroservicesPipeline
 
 ### To Delete the Pipeline
 Use the AWS Console or CLI:
