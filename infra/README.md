@@ -50,3 +50,13 @@ This directory contains the configuration for the AWS CodePipeline and related r
 ## Future Enhancements
 - Add a deploy stage using CloudFormation to provision resources.
 - Implement error handling and notifications for pipeline failures.
+
+### Steps to Use in VS Code:
+1. Open the `README.md` file in your `infra` folder.
+2. Copy and paste the content above.
+3. Save the file.
+4. Push the changes to GitHub using:
+   ```bash
+   git add infra/README.md
+   git commit -m "Add README for pipeline configuration"
+   git push origin main
