@@ -1,0 +1,66 @@
+{
+    "pipeline": {
+        "name": "ServerlessMicroservicesPipeline",
+        "roleArn": "arn:aws:iam::211125598740:role/CodePipelineServiceRole",
+        "artifactStore": {
+            "type": "S3",
+            "location": "serverless-microservices-artifacts"
+        },
+        "stages": [
+            {
+                "name": "Source",
+                "actions": [
+                    {
+                        "name": "GitHub_Source",
+                        "actionTypeId": {
+                            "category": "Source",
+                            "owner": "ThirdParty",
+                            "provider": "GitHub",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "Owner": "AdilMuhammad87",
+                            "Repo": "serverless-ecommerce-app",
+                            "Branch": "main",
+                            "OAuthToken": "{{resolve:secretsmanager:GitHubPersonalAccessToken:SecretString}}"
+                        },
+                        "outputArtifacts": [
+                            {
+                                "name": "SourceArtifact"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Build",
+                "actions": [
+                    {
+                        "name": "CodeBuild",
+                        "actionTypeId": {
+                            "category": "Build",
+                            "owner": "AWS",
+                            "provider": "CodeBuild",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "ProjectName": "ServerlessMicroservicesBuildProject"
+                        },
+                        "inputArtifacts": [
+                            {
+                                "name": "SourceArtifact"
+                            }
+                        ],
+                        "outputArtifacts": [
+                            {
+                                "name": "BuildArtifact"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
