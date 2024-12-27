@@ -40,12 +40,12 @@ This directory contains the configuration for the AWS CodePipeline and related r
 ### To Delete the Pipeline
 1. Run:
    ```bash
-   aws codepipeline list-pipeline-executions --name ServerlessMicroservicesPipeline
+   aws codepipeline delete-pipeline --name ServerlessMicroservicesPipeline
 
 ### To Modify the Pipeline
-Use the AWS Console or CLI:
-``bash
-  aws codepipeline list-pipeline-executions --name ServerlessMicroservicesPipeline
+1. Run:
+   ```bash
+     aws codepipeline list-pipeline-executions --name ServerlessMicroservicesPipeline
 
 ## Future Enhancements
 - Add a deploy stage using CloudFormation to provision resources.
