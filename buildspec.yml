@@ -13,4 +13,4 @@ artifacts:
   files:
     - function.zip
     - infra/template.yaml
-  base-directory: . # Ensures files are in the root of the BuildArtifact
+  base-directory: . # Places these files in the root of BuildArtifact

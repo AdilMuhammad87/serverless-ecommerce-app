@@ -19,6 +19,6 @@ Resources:
       Role: arn:aws:iam::211125598740:role/LambdaExecutionRole
       Runtime: python3.9
       Code:
-        S3Bucket: serverless-microservices-artifacts
-        S3Key: BuildArtifact/function.zip
+        S3Bucket: !Sub "${CodePipelineArtifactBucket}"
+        S3Key: !Sub "${CodePipelineArtifactKey}/function.zip"
 
