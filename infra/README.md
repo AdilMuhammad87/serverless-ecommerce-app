@@ -38,8 +38,10 @@ This directory contains the configuration for the AWS CodePipeline and related r
    aws codepipeline update-pipeline --cli-input-json file://pipeline.json
 
 ### To Delete the Pipeline
-Run:
-aws codepipeline delete-pipeline --name ServerlessMicroservicesPipeline
+1. Modify `pipeline.json` as needed.
+2. Recreate the pipeline using:
+   ```bash
+   aws codepipeline list-pipeline-executions --name ServerlessMicroservicesPipeline
 
 ### To Modify the Pipeline
 Use the AWS Console or CLI:
