@@ -8,11 +8,9 @@ phases:
       - pip install -r requirements.txt
   build:
     commands:
-      - mkdir -p build
-      - zip build/function.zip src/products/*.py
-      - cp infra/template.yaml build/
+      - zip function.zip src/products/*.py
+      - cp infra/template.yaml .
 artifacts:
   files:
-    - build/function.zip
-    - build/template.yaml
-  base-directory: build
+    - function.zip
+    - template.yaml
