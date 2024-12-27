@@ -13,5 +13,6 @@ phases:
       - cp infra/template.yaml build/
 artifacts:
   files:
-    - build/*
+    - build/function.zip
+    - build/template.yaml
   base-directory: build
