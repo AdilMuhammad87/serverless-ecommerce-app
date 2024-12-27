@@ -79,7 +79,7 @@
                             "TemplatePath": "BuildArtifact::template.yaml",
                             "Capabilities": "CAPABILITY_NAMED_IAM",
                             "RoleArn": "arn:aws:iam::211125598740:role/CloudFormationExecutionRole",
-                            "ParameterOverrides": "{ \"LambdaCodeS3Bucket\":\"#{BuildArtifact.ArtifactBucket}\", \"LambdaCodeS3Key\":\"#{BuildArtifact.ArtifactObjectKey}\" }"
+                            "ParameterOverrides": "{ \"LambdaCodeS3Bucket\":\"#{BuildArtifact.BucketName}\", \"LambdaCodeS3Key\":\"#{BuildArtifact.ObjectKey}\" }"
                         },
                         "inputArtifacts": [
                             {
