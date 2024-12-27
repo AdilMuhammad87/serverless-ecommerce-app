@@ -20,4 +20,4 @@ Resources:
       Runtime: python3.9
       Code:
         S3Bucket: serverless-microservices-artifacts
-        S3Key: BuildArtifact/build/function.zip
+        S3Key: BuildArtifact/function.zip
