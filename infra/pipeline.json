@@ -19,7 +19,7 @@
                             "version": "1"
                         },
                         "configuration": {
-                            "ConnectionArn": "arn:aws:codestar-connections:us-east-1:123456789012:connection/xxxxxx",
+                            "ConnectionArn": "arn:aws:codeconnections:us-east-1:211125598740:connection/d7e93359-effc-4bd2-8232-111d617737c4",
                             "FullRepositoryId": "AdilMuhammad87/serverless-ecommerce-app",
                             "BranchName": "main"
                         },
