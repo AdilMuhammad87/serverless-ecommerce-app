@@ -13,12 +13,14 @@ phases:
     commands:
       - echo "Running tests..."
       - python -m unittest discover tests
+      - echo "Zipping Lambda code..."
+      # Create a zip called 'function.zip' containing the src folder
+      - zip -r function.zip src
   post_build:
     commands:
       - echo "Build completed successfully."
 
 artifacts:
   files:
-    - src/lambda_function.py
+    - function.zip
     - template.yaml
-    - requirements.txt
