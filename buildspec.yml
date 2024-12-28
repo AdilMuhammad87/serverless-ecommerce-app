@@ -6,22 +6,18 @@ phases:
       - echo "Installing dependencies..."
       - pip install --upgrade pip
       - pip install -r requirements.txt -t .
-  pre_build:
-    commands:
-      - echo "Running pre-build steps..."
   build:
     commands:
       - echo "Running tests..."
       - python -m unittest discover tests
-      - echo "Zipping Lambda code..."
-      # Zip up everything in src/ folder
-      - zip -r function.zip src
-  post_build:
-    commands:
-      - echo "Build completed successfully."
 
+      - echo "Zipping Lambda code..."
+      - zip -r function.zip src
+
+      - echo "Copying function.zip and template.yaml to a fixed S3 path..."
+      - aws s3 cp function.zip s3://serverless-ecommerce-static-artifacts/fixed-path/function.zip
+      - aws s3 cp template.yaml s3://serverless-ecommerce-static-artifacts/fixed-path/template.yaml
 artifacts:
+  # We produce NO artifacts for CodePipeline => no random S3 path
+  files: []
   discard-paths: yes
-  files:
-    - function.zip
-    - template.yaml
