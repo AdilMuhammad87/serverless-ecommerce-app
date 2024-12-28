@@ -14,16 +14,14 @@
                         "name": "GitHub_Source",
                         "actionTypeId": {
                             "category": "Source",
-                            "owner": "ThirdParty",
-                            "provider": "GitHub",
+                            "owner": "AWS",
+                            "provider": "CodeStarSourceConnection",
                             "version": "1"
                         },
-                        "runOrder": 1,
                         "configuration": {
-                            "Owner": "AdilMuhammad87",
-                            "Repo": "serverless-ecommerce-app",
-                            "Branch": "main",
-                            "OAuthToken": "{{resolve:secretsmanager:GitHubPersonalAccessToken:SecretString}}"
+                            "ConnectionArn": "arn:aws:codestar-connections:us-east-1:123456789012:connection/xxxxxx",
+                            "FullRepositoryId": "AdilMuhammad87/serverless-ecommerce-app",
+                            "BranchName": "main"
                         },
                         "outputArtifacts": [
                             {
