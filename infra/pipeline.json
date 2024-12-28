@@ -48,7 +48,7 @@
                         "configuration": {
                             "ProjectName": "ServerlessMicroservicesBuildProject"
                         },
-                        "namespace": "BuildNamespace", 
+                        "namespace": "BN", 
                         "inputArtifacts": [
                             {
                                 "name": "SourceArtifact"
@@ -80,7 +80,7 @@
                             "TemplatePath": "BuildArtifact::template.yaml",
                             "Capabilities": "CAPABILITY_NAMED_IAM",
                             "RoleArn": "arn:aws:iam::211125598740:role/CloudFormationExecutionRole",
-                            "ParameterOverrides": "{ \"LambdaCodeS3Bucket\":\"#{BuildNamespace.BucketName}\", \"LambdaCodeS3Key\":\"#{BuildNamespace.ObjectKey}\" }"
+                            "ParameterOverrides": "{ \"LambdaCodeS3Bucket\":\"#{BN.BucketName}\", \"LambdaCodeS3Key\":\"#{BN.ObjectKey}\" }"
                         },
                         "inputArtifacts": [
                             {
