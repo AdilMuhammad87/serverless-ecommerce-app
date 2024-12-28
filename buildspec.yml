@@ -14,12 +14,14 @@ phases:
       - echo "Running tests..."
       - python -m unittest discover tests
       - echo "Zipping Lambda code..."
+      # Zip up everything in src/ folder
       - zip -r function.zip src
   post_build:
     commands:
       - echo "Build completed successfully."
 
 artifacts:
+  discard-paths: yes
   files:
     - function.zip
     - template.yaml
