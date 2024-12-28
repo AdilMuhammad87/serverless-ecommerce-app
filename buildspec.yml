@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Installing dependencies..."
+      - pip install --upgrade pip
+      - pip install -r requirements.txt -t .
+  pre_build:
+    commands:
+      - echo "Running pre-build steps..."
+  build:
+    commands:
+      - echo "Running tests..."
+      - python -m unittest discover tests
+  post_build:
+    commands:
+      - echo "Build completed successfully."
+
+artifacts:
+  files:
+    - src/lambda_function.py
+    - template.yaml
+    - requirements.txt
