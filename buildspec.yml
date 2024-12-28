@@ -13,8 +13,7 @@ phases:
     commands:
       - echo "Running tests..."
       - python -m unittest discover tests
-      - echo "Zipping Lambda code..."
-      # Create a zip called 'function.zip' containing the src folder
+      - echo "Zipping Lambda code into function.zip..."
       - zip -r function.zip src
   post_build:
     commands:
