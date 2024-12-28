@@ -1,34 +1,20 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Serverless E-Commerce App - DynamoDB, Lambda, and API Gateway
+Description: Serverless E-Commerce App
 
 Parameters:
   EnvironmentName:
     Type: String
     Default: dev
-    Description: Environment name (e.g., dev, prod)
+
   LambdaArtifactBucket:
     Type: String
-    Description: S3 bucket holding Lambda artifacts
+    Description: "Bucket for Lambda .zip"
+
   LambdaArtifactKey:
     Type: String
-    Description: Key in the S3 bucket for the Lambda artifact
+    Description: "Key for Lambda .zip"
 
 Resources:
-  ProductsTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: !Sub "${EnvironmentName}-Products"
-      AttributeDefinitions:
-        - AttributeName: productId
-          AttributeType: S
-      KeySchema:
-        - AttributeName: productId
-          KeyType: HASH
-      BillingMode: PROVISIONED
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
-
   ProductsLambdaRole:
     Type: AWS::IAM::Role
     Properties:
@@ -38,23 +24,11 @@ Resources:
         Statement:
           - Effect: "Allow"
             Principal:
-              Service:
+              Service: 
                 - "lambda.amazonaws.com"
             Action: "sts:AssumeRole"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-      Policies:
-        - PolicyName: DynamoDBAccess
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - dynamodb:PutItem
-                  - dynamodb:GetItem
-                  - dynamodb:DeleteItem
-                  - dynamodb:UpdateItem
-                Resource: "*"
 
   ProductsLambdaFunction:
     Type: AWS::Lambda::Function
@@ -66,49 +40,9 @@ Resources:
       Code:
         S3Bucket: !Ref LambdaArtifactBucket
         S3Key: !Ref LambdaArtifactKey
-      Environment:
-        Variables:
-          DYNAMODB_TABLE: !Ref ProductsTable
-
-  APIGateway:
-    Type: AWS::ApiGateway::RestApi
-    Properties:
-      Name: !Sub "${EnvironmentName}-EcommerceAPI"
-
-  ApiGatewayResourceProducts:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      RestApiId: !Ref APIGateway
-      ParentId: !GetAtt APIGateway.RootResourceId
-      PathPart: "products"
-
-  ApiGatewayMethodGetProducts:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      RestApiId: !Ref APIGateway
-      ResourceId: !Ref ApiGatewayResourceProducts
-      HttpMethod: GET
-      AuthorizationType: NONE
-      Integration:
-        Type: AWS
-        IntegrationHttpMethod: POST
-        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProductsLambdaFunction.Arn}/invocations"
-        IntegrationResponses:
-          - StatusCode: 200
-        RequestTemplates:
-          application/json: '{"statusCode": 200}'
-      MethodResponses:
-        - StatusCode: 200
-
-  ApiGatewayDeployment:
-    Type: AWS::ApiGateway::Deployment
-    DependsOn:
-      - ApiGatewayMethodGetProducts
-    Properties:
-      RestApiId: !Ref APIGateway
-      StageName: !Sub "${EnvironmentName}"
+      Timeout: 10
 
 Outputs:
-  APIGatewayUrl:
-    Description: "API Gateway Invoke URL"
-    Value: !Sub "https://${APIGateway}.execute-api.${AWS::Region}.amazonaws.com/${EnvironmentName}"
+  LambdaFunctionName:
+    Value: !Ref ProductsLambdaFunction
+    Description: "Name of the Lambda function"
