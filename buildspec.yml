@@ -14,10 +14,7 @@ phases:
       - echo "Zipping Lambda code..."
       - zip -r function.zip src
 
-      - echo "Copying function.zip and template.yaml to a fixed S3 path..."
+      - echo "Uploading function.zip to a fixed S3 path..."
       - aws s3 cp function.zip s3://serverless-ecommerce-static-artifacts/fixed-path/function.zip
-      - aws s3 cp template.yaml s3://serverless-ecommerce-static-artifacts/fixed-path/template.yaml
 artifacts:
-  # We produce NO artifacts for CodePipeline => no random S3 path
   files: []
-  discard-paths: yes
