@@ -1,18 +1,29 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Serverless E-Commerce App
+Description: Serverless E-Commerce App with API Gateway
 
 Parameters:
   EnvironmentName:
     Type: String
     Default: dev
+    Description: Environment name (e.g., dev, prod)
+
+  LambdaFunctionName:
+    Type: String
+    Default: ProductsLambda
+    Description: Name of the Products Lambda function
 
   LambdaArtifactBucket:
     Type: String
-    Description: "Bucket for Lambda .zip"
+    Description: S3 bucket for Lambda .zip
 
   LambdaArtifactKey:
     Type: String
-    Description: "Key for Lambda .zip"
+    Description: S3 key (file path) for Lambda .zip
+
+  LambdaTimeout:
+    Type: Number
+    Default: 10
+    Description: Timeout for Lambda function in seconds
 
 Resources:
   ProductsLambdaRole:
@@ -29,20 +40,98 @@ Resources:
             Action: "sts:AssumeRole"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:UpdateItem
+                Resource: "*"
 
   ProductsLambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: !Sub "${EnvironmentName}-ProductsLambda"
+      FunctionName: !Sub "${EnvironmentName}-${LambdaFunctionName}"
       Runtime: python3.9
       Handler: lambda_function.lambda_handler
       Role: !GetAtt ProductsLambdaRole.Arn
       Code:
         S3Bucket: !Ref LambdaArtifactBucket
         S3Key: !Ref LambdaArtifactKey
-      Timeout: 10
+      Timeout: !Ref LambdaTimeout
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref EnvironmentName
+
+  ApiGatewayRestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub "${EnvironmentName}-EcommerceAPI"
+      Description: "API Gateway for Serverless E-Commerce App"
+
+  ApiGatewayResourceProducts:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ApiGatewayRestApi.RootResourceId
+      PathPart: products
+      RestApiId: !Ref ApiGatewayRestApi
+
+  ApiGatewayMethodGetProduct:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: "NONE"
+      HttpMethod: "GET"
+      ResourceId: !Ref ApiGatewayResourceProducts
+      RestApiId: !Ref ApiGatewayRestApi
+      Integration:
+        IntegrationHttpMethod: "POST"
+        Type: "AWS_PROXY"
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProductsLambdaFunction.Arn}/invocations"
+
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - ApiGatewayMethodGetProduct
+    Properties:
+      RestApiId: !Ref ApiGatewayRestApi
+      StageName: dev
+
+  LambdaPermissionApiGateway:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ProductsLambdaFunction
+      Action: "lambda:InvokeFunction"
+      Principal: "apigateway.amazonaws.com"
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGatewayRestApi}/*/GET/products"
+
+  LambdaErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${EnvironmentName}-LambdaErrorAlarm"
+      AlarmDescription: "Alarm for Lambda function errors"
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref ProductsLambdaFunction
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      AlarmActions:
+        - arn:aws:sns:us-east-1:211125598740:cicd-notifications
 
 Outputs:
-  LambdaFunctionName:
+  ProductsLambdaFunctionName:
     Value: !Ref ProductsLambdaFunction
-    Description: "Name of the Lambda function"
+    Description: "Name of the Products Lambda function"
+
+  ApiGatewayUrl:
+    Value: !Sub "https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/dev/products"
+    Description: "URL of the API Gateway for Products"
