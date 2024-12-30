@@ -1,0 +1,98 @@
+{
+  "pipeline": {
+    "name": "ServerlessEcommercePipeline",
+    "roleArn": "arn:aws:iam::211125598740:role/CodePipelineServiceRole",
+    "artifactStore": {
+      "type": "S3",
+      "location": "serverless-ecommerce-artifacts-2024"
+    },
+    "stages": [
+      {
+        "name": "Source",
+        "actions": [
+          {
+            "name": "GitHub_Source",
+            "actionTypeId": {
+              "category": "Source",
+              "owner": "ThirdParty",
+              "provider": "GitHub",
+              "version": "1"
+            },
+            "runOrder": 1,
+            "configuration": {
+              "Owner": "AdilMuhammad87",
+              "Repo": "serverless-ecommerce-app",
+              "Branch": "main",
+              "OAuthToken": "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"
+            },
+            "outputArtifacts": [
+              {
+                "name": "SourceOutput"
+              }
+            ],
+            "inputArtifacts": []
+          }
+        ]
+      },
+      {
+        "name": "Build",
+        "actions": [
+          {
+            "name": "CodeBuild_Action",
+            "actionTypeId": {
+              "category": "Build",
+              "owner": "AWS",
+              "provider": "CodeBuild",
+              "version": "1"
+            },
+            "runOrder": 1,
+            "configuration": {
+              "ProjectName": "serverless-ecommerce-build"
+            },
+            "inputArtifacts": [
+              {
+                "name": "SourceOutput"
+              }
+            ],
+            "outputArtifacts": []
+          }
+        ]
+      },
+      {
+        "name": "Deploy",
+        "actions": [
+          {
+            "name": "CloudFormation_Deploy",
+            "actionTypeId": {
+              "category": "Deploy",
+              "owner": "AWS",
+              "provider": "CloudFormation",
+              "version": "1"
+            },
+            "runOrder": 1,
+            "configuration": {
+              "ActionMode": "CREATE_UPDATE",
+              "RoleArn": "arn:aws:iam::211125598740:role/CloudFormationDeploymentRole",
+              "StackName": "serverless-ecommerce-stack",
+              "Capabilities": "CAPABILITY_NAMED_IAM",
+              "TemplatePath": "SourceOutput::template.yaml",
+              "ParameterOverrides": "{\"EnvironmentName\":\"dev\",\"LambdaArtifactBucket\":\"serverless-ecommerce-static-artifacts\",\"LambdaArtifactKey\":\"fixed-path/function.zip\"}",
+              "OutputFileName": "CloudFormationOutput.json"
+            },
+            "inputArtifacts": [
+              {
+                "name": "SourceOutput"
+              }
+            ],
+            "outputArtifacts": [
+              {
+                "name": "DeployOutput"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "version": 1
+  }
+}
