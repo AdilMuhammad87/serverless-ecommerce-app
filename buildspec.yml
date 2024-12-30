@@ -14,7 +14,9 @@ phases:
       - echo "Running unit tests..."
       - python -m unittest discover tests
       - echo "Zipping Lambda code..."
-      - zip -r function.zip src
+      - cd src
+      - zip -r ../function.zip .
+      - cd ..
       - echo "Uploading function.zip and template.yaml to fixed S3 path..."
       - aws s3 cp function.zip s3://serverless-ecommerce-static-artifacts/fixed-path/function.zip
       - aws s3 cp template.yaml s3://serverless-ecommerce-static-artifacts/fixed-path/template.yaml
