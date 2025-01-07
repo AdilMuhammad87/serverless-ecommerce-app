@@ -53,18 +53,6 @@ Resources:
                   - dynamodb:UpdateItem
                 Resource: "*"
 
-  ProductsDynamoDBTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: Products
-      AttributeDefinitions:
-        - AttributeName: productId
-          AttributeType: S
-      KeySchema:
-        - AttributeName: productId
-          KeyType: HASH
-      BillingMode: PAY_PER_REQUEST
-
   ProductsLambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
