@@ -76,6 +76,7 @@ Resources:
         S3Bucket: !Ref LambdaArtifactBucket
         S3Key: !Ref LambdaArtifactKey
       Timeout: !Ref LambdaTimeout
+      MemorySize: 512
       Environment:
         Variables:
           ENVIRONMENT: !Ref EnvironmentName
