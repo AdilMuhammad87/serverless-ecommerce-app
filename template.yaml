@@ -70,7 +70,7 @@ Resources:
     Properties:
       FunctionName: !Sub "${EnvironmentName}-${LambdaFunctionName}"
       Runtime: python3.9
-      Handler: lambda_function.lambda_handler
+      Handler: products/lambda_function.lambda_handler
       Role: !GetAtt ProductsLambdaRole.Arn
       Code:
         S3Bucket: !Ref LambdaArtifactBucket
