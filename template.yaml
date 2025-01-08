@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Serverless E-Commerce App with API Gateway
+Description: Serverless E-Commerce App with API Gateway, Cart + Cognito Auth
 
 Parameters:
   EnvironmentName:
@@ -26,6 +26,75 @@ Parameters:
     Description: Timeout for Lambda function in seconds
 
 Resources:
+  ProductsDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Products
+      AttributeDefinitions:
+        - AttributeName: productId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: productId
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
+
+  ShoppingCartTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ShoppingCart
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: itemId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: itemId
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
+
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "${EnvironmentName}-UserPool"
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+          RequireUppercase: false
+
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub "${EnvironmentName}-UserPoolClient"
+      UserPoolId: !Ref CognitoUserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_REFRESH_TOKEN_AUTH
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_USER_PASSWORD_AUTH
+
+  ApiGatewayCognitoAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: !Sub "${EnvironmentName}-CognitoAuthorizer"
+      Type: COGNITO_USER_POOLS
+      IdentitySource: method.request.header.Authorization
+      RestApiId: !Ref ApiGatewayRestApi
+      ProviderARNs:
+        - !GetAtt CognitoUserPool.Arn
+
   ProductsLambdaRole:
     Type: AWS::IAM::Role
     Properties:
@@ -35,7 +104,7 @@ Resources:
         Statement:
           - Effect: "Allow"
             Principal:
-              Service: 
+              Service:
                 - "lambda.amazonaws.com"
             Action: "sts:AssumeRole"
       ManagedPolicyArns:
@@ -51,7 +120,10 @@ Resources:
                   - dynamodb:GetItem
                   - dynamodb:DeleteItem
                   - dynamodb:UpdateItem
-                Resource: "*"
+                  - dynamodb:Query
+                Resource:
+                  - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/Products"
+                  - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/ShoppingCart"
 
   ProductsLambdaFunction:
     Type: AWS::Lambda::Function
@@ -68,6 +140,22 @@ Resources:
       Environment:
         Variables:
           ENVIRONMENT: !Ref EnvironmentName
+
+  ShoppingCartLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${EnvironmentName}-ShoppingCartLambda"
+      Runtime: python3.9
+      Handler: orders/lambda_function.lambda_handler
+      Role: !GetAtt ProductsLambdaRole.Arn
+      Code:
+        S3Bucket: !Ref LambdaArtifactBucket
+        S3Key: !Ref LambdaArtifactKey
+      MemorySize: 512
+      Timeout: 10
+      Environment:
+        Variables:
+          CART_TABLE: "ShoppingCart"
 
   ApiGatewayRestApi:
     Type: AWS::ApiGateway::RestApi
@@ -118,12 +206,61 @@ Resources:
         Type: "AWS_PROXY"
         Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ProductsLambdaFunction.Arn}/invocations"
 
-  ApiGatewayDeployment:
+  ApiGatewayResourceCart:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ApiGatewayRestApi.RootResourceId
+      PathPart: cart
+      RestApiId: !Ref ApiGatewayRestApi
+
+  ApiGatewayMethodGetCart:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref ApiGatewayCognitoAuthorizer
+      HttpMethod: GET
+      ResourceId: !Ref ApiGatewayResourceCart
+      RestApiId: !Ref ApiGatewayRestApi
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ShoppingCartLambdaFunction.Arn}/invocations"
+
+  ApiGatewayMethodPostCart:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref ApiGatewayCognitoAuthorizer
+      HttpMethod: POST
+      ResourceId: !Ref ApiGatewayResourceCart
+      RestApiId: !Ref ApiGatewayRestApi
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ShoppingCartLambdaFunction.Arn}/invocations"
+
+  ApiGatewayMethodDeleteCart:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref ApiGatewayCognitoAuthorizer
+      HttpMethod: DELETE
+      ResourceId: !Ref ApiGatewayResourceCart
+      RestApiId: !Ref ApiGatewayRestApi
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ShoppingCartLambdaFunction.Arn}/invocations"
+
+ ApiGatewayDeployment:
     Type: AWS::ApiGateway::Deployment
     DependsOn:
       - ApiGatewayMethodGetProduct
       - ApiGatewayMethodPostProduct
       - ApiGatewayMethodDeleteProduct
+      - ApiGatewayMethodGetCart
+      - ApiGatewayMethodPostCart
+      - ApiGatewayMethodDeleteCart
     Properties:
       RestApiId: !Ref ApiGatewayRestApi
       StageName: dev
