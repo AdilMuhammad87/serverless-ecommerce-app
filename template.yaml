@@ -222,8 +222,8 @@ Resources:
       ResourceId: !Ref ApiGatewayResourceCart
       RestApiId: !Ref ApiGatewayRestApi
       Integration:
-        IntegrationHttpMethod: POST
-        Type: AWS_PROXY
+        IntegrationHttpMethod: "POST"
+        Type: "AWS_PROXY"
         Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ShoppingCartLambdaFunction.Arn}/invocations"
 
   ApiGatewayMethodPostCart:
@@ -236,7 +236,7 @@ Resources:
       RestApiId: !Ref ApiGatewayRestApi
       Integration:
         IntegrationHttpMethod: POST
-        Type: AWS_PROXY
+        Type: "AWS_PROXY"
         Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ShoppingCartLambdaFunction.Arn}/invocations"
 
   ApiGatewayMethodDeleteCart:
@@ -249,10 +249,10 @@ Resources:
       RestApiId: !Ref ApiGatewayRestApi
       Integration:
         IntegrationHttpMethod: POST
-        Type: AWS_PROXY
+        Type: "AWS_PROXY"
         Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ShoppingCartLambdaFunction.Arn}/invocations"
 
- ApiGatewayDeployment:
+  ApiGatewayDeployment:
     Type: AWS::ApiGateway::Deployment
     DependsOn:
       - ApiGatewayMethodGetProduct
