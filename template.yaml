@@ -66,13 +66,6 @@ Resources:
         - email
       AutoVerifiedAttributes:
         - email
-      Policies:
-        PasswordPolicy:
-          MinimumLength: 8
-          RequireLowercase: true
-          RequireNumbers: true
-          RequireSymbols: false
-          RequireUppercase: false
 
   CognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
@@ -80,10 +73,6 @@ Resources:
       ClientName: !Sub "${EnvironmentName}-UserPoolClient"
       UserPoolId: !Ref CognitoUserPool
       GenerateSecret: false
-      ExplicitAuthFlows:
-        - ALLOW_REFRESH_TOKEN_AUTH
-        - ALLOW_USER_SRP_AUTH
-        - ALLOW_USER_PASSWORD_AUTH
 
   ApiGatewayCognitoAuthorizer:
     Type: AWS::ApiGateway::Authorizer
@@ -258,9 +247,7 @@ Resources:
       - ApiGatewayMethodGetProduct
       - ApiGatewayMethodPostProduct
       - ApiGatewayMethodDeleteProduct
-      - ApiGatewayMethodGetCart
-      - ApiGatewayMethodPostCart
-      - ApiGatewayMethodDeleteCart
+
     Properties:
       RestApiId: !Ref ApiGatewayRestApi
       StageName: dev
