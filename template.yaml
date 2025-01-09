@@ -247,7 +247,9 @@ Resources:
       - ApiGatewayMethodGetProduct
       - ApiGatewayMethodPostProduct
       - ApiGatewayMethodDeleteProduct
-
+      - ApiGatewayMethodGetCart
+      - ApiGatewayMethodPostCart
+      - ApiGatewayMethodDeleteCart
     Properties:
       RestApiId: !Ref ApiGatewayRestApi
       StageName: dev
