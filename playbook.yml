@@ -3,8 +3,8 @@
   hosts: all
   become: yes
   vars:
-    aws_access_key_id: "AKIATCKAQ7IKFCPO7U7D"
-    aws_secret_access_key: "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"
+    aws_access_key_id: ""
+    aws_secret_access_key: ""
     aws_region: "us-east-1"
     environment_name: "dev"
     dynamo_table_name: "Products"
